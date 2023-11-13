@@ -7,34 +7,33 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mylogistics.enums.RoleType;
-import com.mylogistics.model.Carrier;
+import com.mylogistics.model.Customer;
+import com.mylogistics.model.Executive;
 import com.mylogistics.model.User;
-import com.mylogistics.service.CarrierService;
+import com.mylogistics.service.ExecutiveService;
 import com.mylogistics.service.UserService;
 
 @RestController
-public class CarrierController {
-
+public class ExecutiveController {
 	@Autowired
-	private CarrierService carrierService;
+	private ExecutiveService executiveService;
 	@Autowired
 	private UserService userService;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-	@PostMapping("/carrier/add")
-	public Carrier postCustomer(@RequestBody Carrier carrier) {
-		User user = carrier.getUser();
+	@PostMapping("/executive/add")
+	public Executive postExecutive(@RequestBody Executive executive) {
+		User user = executive.getUser();
 		/*I am encrypting the password*/
 		String passwordPlain=user.getPassword();
 		String encodedPassword=passwordEncoder.encode(passwordPlain);
 		user.setPassword(encodedPassword);
-		user.setRole(RoleType.CARRIER);
+		user.setRole(RoleType.EXECUTIVE);
 		//Step 1 Save user in db and attach saved user to customer
 		user = userService.postUser(user);
-		//Step 2: Attach user and save carrier
-		carrier.setUser(user);
-		carrier = carrierService.postCustomer(carrier);
-		return carrier; 
+		//Step 2: Attach user and save customer
+		executive.setUser(user);
+		executive = executiveService.postExecutive(executive);
+		return executive; 
 	}
-	
 }
