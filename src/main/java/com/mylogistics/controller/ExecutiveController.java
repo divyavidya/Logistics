@@ -48,72 +48,80 @@ public class ExecutiveController {
 	private CarrierService carrierService;
 	@Autowired
 	private OrderService orderService;
+
 	@PostMapping("/add")
 	public Executive postExecutive(@RequestBody Executive executive) {
 		User user = executive.getUser();
-		/*I am encrypting the password*/
-		String passwordPlain=user.getPassword();
-		String encodedPassword=passwordEncoder.encode(passwordPlain);
+		/* I am encrypting the password */
+		String passwordPlain = user.getPassword();
+		String encodedPassword = passwordEncoder.encode(passwordPlain);
 		user.setPassword(encodedPassword);
 		user.setRole(RoleType.EXECUTIVE);
-		//Step 1 Save user in db and attach saved user to customer
+		// Step 1 Save user in db and attach saved user to customer
 		user = userService.postUser(user);
-		//Step 2: Attach user and save customer
+		// Step 2: Attach user and save customer
 		executive.setUser(user);
 		executive = executiveService.postExecutive(executive);
-		return executive; 
+		return executive;
 	}
+
 	@PostMapping("/addRoute")
 	public Route postExecutive(@RequestBody Route route) {
 		route = routeService.postRoute(route);
-		return route; 
+		return route;
 	}
+
 	@GetMapping("/getallRoutes")
-	public List<Route> getAll(@RequestParam(value="page",required=false,defaultValue="0") Integer page,
-			@RequestParam(value="size",required=false,defaultValue="100000") Integer size) {
-		Pageable pageable= PageRequest.of(page, size);
+	public List<Route> getAll(@RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+			@RequestParam(value = "size", required = false, defaultValue = "100000") Integer size) {
+		Pageable pageable = PageRequest.of(page, size);
 		return routeService.getAll(pageable);
 	}
+
 	@GetMapping("/getallCustomers")
-	public List<Customer> getAllCustomers(@RequestParam(value="page",required=false,defaultValue="0") Integer page,
-			@RequestParam(value="size",required=false,defaultValue="100000") Integer size) {
-		Pageable pageable= PageRequest.of(page, size);
+	public List<Customer> getAllCustomers(
+			@RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+			@RequestParam(value = "size", required = false, defaultValue = "100000") Integer size) {
+		Pageable pageable = PageRequest.of(page, size);
 		return customerService.getAllCustomers(pageable);
 	}
+
 	@GetMapping("/getallCarriers")
-	public List<Carrier> getAllCarriers(@RequestParam(value="page",required=false,defaultValue="0") Integer page,
-			@RequestParam(value="size",required=false,defaultValue="100000") Integer size) {
-		Pageable pageable= PageRequest.of(page, size);
+	public List<Carrier> getAllCarriers(
+			@RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+			@RequestParam(value = "size", required = false, defaultValue = "100000") Integer size) {
+		Pageable pageable = PageRequest.of(page, size);
 		return carrierService.getAllCarriers(pageable);
 	}
-@PutMapping("/putCarrier/{oid}")
-public ResponseEntity<?> updateCarrier(@PathVariable("oid") int oid,@RequestBody Order newOrder){
-	try {
-		//Carrier carrier=carrierService.getCarrierById(caid);
-		Order order=orderService.getOrderById(oid);
-		if(newOrder.getPickUpAddress()!=null)
-			order.setPickUpAddress(newOrder.getPickUpAddress());
-		if(newOrder.getPickUpDate()!=null)
-			order.setPickUpDate(newOrder.getPickUpDate());
-		if(newOrder.getCost()!=0)
-			order.setCost(newOrder.getCost());
-		if(newOrder.getStatus()!=null)
-			order.setStatus(newOrder.getStatus());
-		if(newOrder.getCustomer()!=null)
-			order.setCustomer(newOrder.getCustomer());
-		if(newOrder.getProduct()!=null)
-			order.setProduct(newOrder.getProduct());
-		if(newOrder.getReceiver()!=null)
-			order.setReceiver(newOrder.getReceiver());
-		if(newOrder.getRoute()!=null)
-			order.setRoute(newOrder.getRoute());
-		if(order.getCarrier()!=null)
-		order.setCarrier(newOrder.getCarrier());
-		order=orderService.postOrder(order);	
-		return ResponseEntity.ok().body(order);
+
+	@PutMapping("/putCarrier/{oid}/{caid}")
+	public ResponseEntity<?> updateCarrier(@PathVariable("oid") int oid, @PathVariable("caid") int caid,
+			@RequestBody Order newOrder) {
+		try {
+			Carrier carrier = carrierService.getCarrierById(caid);
+			Order order = orderService.getOrderById(oid);
+			order.setCarrier(carrier);
+			if (newOrder.getPickUpAddress() != null)
+				order.setPickUpAddress(newOrder.getPickUpAddress());
+			if (newOrder.getPickUpDate() != null)
+				order.setPickUpDate(newOrder.getPickUpDate());
+			if (newOrder.getCost() != 0)
+				order.setCost(newOrder.getCost());
+			if (newOrder.getStatus() != null)
+				order.setStatus(newOrder.getStatus());
+			if (newOrder.getCustomer() != null)
+				order.setCustomer(newOrder.getCustomer());
+			if (newOrder.getProduct() != null)
+				order.setProduct(newOrder.getProduct());
+			if (newOrder.getReceiver() != null)
+				order.setReceiver(newOrder.getReceiver());
+			if (newOrder.getRoute() != null)
+				order.setRoute(newOrder.getRoute());
+
+			order = orderService.postOrder(order);
+			return ResponseEntity.ok().body(order);
+		} catch (InvalidIdException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
 	}
-	catch(InvalidIdException e) {
-	return ResponseEntity.badRequest().body(e.getMessage());
-	}
-}
 }
