@@ -1,15 +1,24 @@
 package com.mylogistics.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mylogistics.enums.RoleType;
+import com.mylogistics.exception.InvalidIdException;
 import com.mylogistics.model.Customer;
+import com.mylogistics.model.Order;
+import com.mylogistics.model.Product;
+import com.mylogistics.model.Route;
 import com.mylogistics.model.User;
 import com.mylogistics.service.CustomerService;
+import com.mylogistics.service.ProductService;
+import com.mylogistics.service.RouteService;
 import com.mylogistics.service.UserService;
 
 
@@ -23,6 +32,12 @@ public class CustomerController {
 	private UserService userService;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	@Autowired
+	private RouteService routeService;
+	@Autowired
+	private ProductService productService;
+	
+	
 	@PostMapping("/customer/signup")
 	public Customer postCustomer(@RequestBody Customer customer) {
 		User user = customer.getUser();
@@ -38,4 +53,38 @@ public class CustomerController {
 		customer = customerService.postCustomer(customer);
 		return customer; 
 	}
+	
+	/*@GetMapping("/customer/order/{source}/{destination}")
+	public ResponseEntity<?> placeOrder(@RequestBody Order order,@PathVariable("source") String source, 
+			@PathVariable("destination") String destination) {
+		try{
+			Route route = routeService.getBySrcDest(source,destination);
+			return ResponseEntity.ok().body(route);
+			
+		}catch(InvalidIdException e) {
+			
+		}
+	}*/
+	
+	@PostMapping("/customer/{source}/{destination}")
+	public ResponseEntity<?> placeOrder(@RequestBody Order order,@PathVariable("source") String source, 
+			@PathVariable("destination") String destination) {
+		try{
+			Route route = routeService.getBySrcDest(source,destination);
+			order.setRoute(route);
+			double distance=route.getDistance();
+			int days=Integer.parseInt(route.getNoOfDays());
+			double cost = distance*days;
+			order.setCost(cost);
+			Product product = productService.postProduct(order.getProduct());
+			order.setProduct(product);
+			
+			
+			return ResponseEntity.ok().body(route);
+			
+		}catch(InvalidIdException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+	}
+	
 }
