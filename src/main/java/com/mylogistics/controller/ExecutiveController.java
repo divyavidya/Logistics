@@ -9,18 +9,24 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mylogistics.enums.RoleType;
+import com.mylogistics.model.Carrier;
+import com.mylogistics.model.Customer;
 import com.mylogistics.model.Executive;
 import com.mylogistics.model.Route;
 import com.mylogistics.model.User;
+import com.mylogistics.service.CarrierService;
+import com.mylogistics.service.CustomerService;
 import com.mylogistics.service.ExecutiveService;
 import com.mylogistics.service.RouteService;
 import com.mylogistics.service.UserService;
 
 @RestController
+@RequestMapping("/executive")
 public class ExecutiveController {
 	@Autowired
 	private ExecutiveService executiveService;
@@ -30,8 +36,12 @@ public class ExecutiveController {
 	private PasswordEncoder passwordEncoder;
 	@Autowired
 	private RouteService routeService;
+	@Autowired
+	private CustomerService customerService;
+	@Autowired
+	private CarrierService carrierService;
 	
-	@PostMapping("/executive/add")
+	@PostMapping("/add")
 	public Executive postExecutive(@RequestBody Executive executive) {
 		User user = executive.getUser();
 		/*I am encrypting the password*/
@@ -46,17 +56,28 @@ public class ExecutiveController {
 		executive = executiveService.postExecutive(executive);
 		return executive; 
 	}
-	@PostMapping("/executive/addRoute")
+	@PostMapping("/addRoute")
 	public Route postExecutive(@RequestBody Route route) {
 		route = routeService.postRoute(route);
 		return route; 
 	}
-	@GetMapping("/executive/getallRoutes")
+	@GetMapping("/getallRoutes")
 	public List<Route> getAll(@RequestParam(value="page",required=false,defaultValue="0") Integer page,
 			@RequestParam(value="size",required=false,defaultValue="100000") Integer size) {
 		Pageable pageable= PageRequest.of(page, size);
 		return routeService.getAll(pageable);
 	}
-	
+	@GetMapping("/getallCustomers")
+	public List<Customer> getAllCustomers(@RequestParam(value="page",required=false,defaultValue="0") Integer page,
+			@RequestParam(value="size",required=false,defaultValue="100000") Integer size) {
+		Pageable pageable= PageRequest.of(page, size);
+		return customerService.getAllCustomers(pageable);
+	}
+	@GetMapping("/getallCarriers")
+	public List<Carrier> getAllCarriers(@RequestParam(value="page",required=false,defaultValue="0") Integer page,
+			@RequestParam(value="size",required=false,defaultValue="100000") Integer size) {
+		Pageable pageable= PageRequest.of(page, size);
+		return carrierService.getAllCarriers(pageable);
+	}
 
 }
