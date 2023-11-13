@@ -1,16 +1,23 @@
 package com.mylogistics.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mylogistics.enums.RoleType;
-import com.mylogistics.model.Customer;
 import com.mylogistics.model.Executive;
+import com.mylogistics.model.Route;
 import com.mylogistics.model.User;
 import com.mylogistics.service.ExecutiveService;
+import com.mylogistics.service.RouteService;
 import com.mylogistics.service.UserService;
 
 @RestController
@@ -21,6 +28,9 @@ public class ExecutiveController {
 	private UserService userService;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	@Autowired
+	private RouteService routeService;
+	
 	@PostMapping("/executive/add")
 	public Executive postExecutive(@RequestBody Executive executive) {
 		User user = executive.getUser();
@@ -36,4 +46,17 @@ public class ExecutiveController {
 		executive = executiveService.postExecutive(executive);
 		return executive; 
 	}
+	@PostMapping("/executive/addRoute")
+	public Route postExecutive(@RequestBody Route route) {
+		route = routeService.postRoute(route);
+		return route; 
+	}
+	@GetMapping("/executive/getallRoutes")
+	public List<Route> getAll(@RequestParam(value="page",required=false,defaultValue="0") Integer page,
+			@RequestParam(value="size",required=false,defaultValue="100000") Integer size) {
+		Pageable pageable= PageRequest.of(page, size);
+		return routeService.getAll(pageable);
+	}
+	
+
 }
