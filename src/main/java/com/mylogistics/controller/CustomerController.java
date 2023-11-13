@@ -14,10 +14,13 @@ import com.mylogistics.exception.InvalidIdException;
 import com.mylogistics.model.Customer;
 import com.mylogistics.model.Order;
 import com.mylogistics.model.Product;
+import com.mylogistics.model.Receiver;
 import com.mylogistics.model.Route;
 import com.mylogistics.model.User;
 import com.mylogistics.service.CustomerService;
+import com.mylogistics.service.OrderService;
 import com.mylogistics.service.ProductService;
+import com.mylogistics.service.ReceiverService;
 import com.mylogistics.service.RouteService;
 import com.mylogistics.service.UserService;
 
@@ -36,7 +39,10 @@ public class CustomerController {
 	private RouteService routeService;
 	@Autowired
 	private ProductService productService;
-	
+	@Autowired
+	private ReceiverService receiverService;
+	@Autowired
+	private OrderService orderService;
 	
 	@PostMapping("/customer/signup")
 	public Customer postCustomer(@RequestBody Customer customer) {
@@ -54,20 +60,9 @@ public class CustomerController {
 		return customer; 
 	}
 	
-	/*@GetMapping("/customer/order/{source}/{destination}")
-	public ResponseEntity<?> placeOrder(@RequestBody Order order,@PathVariable("source") String source, 
-			@PathVariable("destination") String destination) {
-		try{
-			Route route = routeService.getBySrcDest(source,destination);
-			return ResponseEntity.ok().body(route);
-			
-		}catch(InvalidIdException e) {
-			
-		}
-	}*/
 	
-	@PostMapping("/customer/{source}/{destination}")
-	public ResponseEntity<?> placeOrder(@RequestBody Order order,@PathVariable("source") String source, 
+	@PostMapping("/customer/{cid}/{source}/{destination}")
+	public ResponseEntity<?> placeOrder(@RequestBody Order order,@PathVariable("cid") int cid,@PathVariable("source") String source, 
 			@PathVariable("destination") String destination) {
 		try{
 			Route route = routeService.getBySrcDest(source,destination);
@@ -76,11 +71,15 @@ public class CustomerController {
 			int days=Integer.parseInt(route.getNoOfDays());
 			double cost = distance*days;
 			order.setCost(cost);
+			order.setStatus("Ready to ship");
+			Customer customer=customerService.getOne(cid);
+			order.setCustomer(customer);
 			Product product = productService.postProduct(order.getProduct());
 			order.setProduct(product);
-			
-			
-			return ResponseEntity.ok().body(route);
+			Receiver receiver=receiverService.postReceiver(order.getReceiver());
+			order.setReceiver(receiver);
+			order=orderService.postOrder(order);
+			return ResponseEntity.ok().body(order);
 			
 		}catch(InvalidIdException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
