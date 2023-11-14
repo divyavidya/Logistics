@@ -25,6 +25,7 @@ import com.mylogistics.service.CarrierService;
 import com.mylogistics.service.OrderService;
 import com.mylogistics.service.UserService;
 
+
 @RestController
 @RequestMapping("/carrier")
 public class CarrierController {
@@ -79,6 +80,17 @@ public class CarrierController {
 			order = orderService.postOrder(order);
 			return ResponseEntity.ok().body(order);
 		} catch (InvalidIdException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+	}
+	@GetMapping("/getAllOrders/{caid}")
+	public ResponseEntity<?> getProductsByVendor(@PathVariable("caid") int caid){
+		try {
+			//get order by CarrierId
+			Carrier carrier =carrierService.getCarrierById(caid);
+			List<Order> list = orderService.getOrdersByCarrier(caid);
+			return ResponseEntity.ok().body(list);
+		}catch(InvalidIdException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}

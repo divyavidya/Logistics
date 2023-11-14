@@ -3,6 +3,7 @@ package com.mylogistics.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -64,17 +65,22 @@ public class CustomerController {
 	public ResponseEntity<?> placeOrder(@RequestBody Order order,@PathVariable("cid") int cid,@PathVariable("source") String source, 
 			@PathVariable("destination") String destination) {
 		try{
+			//get route by source,destination and save in order
 			Route route = routeService.getBySrcDest(source,destination);
 			order.setRoute(route);
+			//calculate cost
 			double distance=route.getDistance();
 			int days=Integer.parseInt(route.getNoOfDays());
 			double cost = distance*days;
 			order.setCost(cost);
-			order.setStatus("Ready to ship");
+			order.setStatus("Booked Order");
+			//fetch customer id and save in order
 			Customer customer=customerService.getOne(cid);
 			order.setCustomer(customer);
+			//save product details in db and save product id in order
 			Product product = productService.postProduct(order.getProduct());
 			order.setProduct(product);
+			//save receiver details in db and save receiver id in order
 			Receiver receiver=receiverService.postReceiver(order.getReceiver());
 			order.setReceiver(receiver);
 			order=orderService.postOrder(order);
@@ -84,5 +90,6 @@ public class CustomerController {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}
+	
 	
 }
