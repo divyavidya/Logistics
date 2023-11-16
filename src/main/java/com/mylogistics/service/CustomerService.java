@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.mylogistics.exception.InvalidIdException;
+import com.mylogistics.model.Carrier;
 import com.mylogistics.model.Customer;
 import com.mylogistics.model.Route;
 import com.mylogistics.repository.CustomerRepository;
@@ -29,6 +30,13 @@ public class CustomerService {
 		Optional<Customer> optional = customerRepository.findById(cid);
 		 if(!optional.isPresent())
 				throw new InvalidIdException("customer id is invalid");
+			return optional.get();
+	}
+	public Customer getCustomerById(int cid) throws InvalidIdException{
+		// TODO Auto-generated method stub
+		Optional<Customer> optional = customerRepository.findById(cid);
+		 if(!optional.isPresent())
+				throw new InvalidIdException("Customer Id is invalid");
 			return optional.get();
 	}
 }

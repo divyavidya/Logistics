@@ -30,4 +30,10 @@ private OrderRepository orderRepository;
 		return orderRepository.findByCarrierId(caid);
 	}
 
+	public List<Order> getOrdersByCustomer(int cid) {
+		// TODO Auto-generated method stub
+		return orderRepository.findByCustomerId(cid);
+	}
+
+
 }
