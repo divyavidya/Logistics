@@ -27,6 +27,10 @@ private UserRepository userRepository;
 		
 		return userRepository.save(user);
 	}
+	public void deleteUser(User user) {
+		userRepository.delete(user);
+		
+	}
 
 }
 

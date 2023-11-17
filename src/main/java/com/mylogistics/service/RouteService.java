@@ -33,4 +33,16 @@ public class RouteService {
 	
 	}
 
+	public Route getRouteById(int rid) throws InvalidIdException {
+		Optional<Route> optional = routeRepository.findById(rid);
+		 if(!optional.isPresent())
+				throw new InvalidIdException("Route id invalid");
+			return optional.get();
+	}
+
+	public void deleteRoute(int id) {
+		routeRepository.deleteById(id);
+		
+	}
+
 }

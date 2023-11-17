@@ -1,5 +1,7 @@
 package com.mylogistics.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -90,6 +92,26 @@ public class CustomerController {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}
-	
-	
+	@GetMapping("/customer/getAllOrdersHistory/{cid}")
+	public ResponseEntity<?> getOrdersByCustomer(@PathVariable("cid") int cid){
+		try {
+			//get order by CarrierId
+			Customer customer =customerService.getCustomerById(cid);
+			List<Order> list = orderService.getOrdersByCustomer(cid);
+			return ResponseEntity.ok().body(list);
+		}catch(InvalidIdException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+	}
+	@GetMapping("customer/getOrder/{oid}")
+	public ResponseEntity<?> getOneOrder(@PathVariable("oid") int oid) {
+		try {
+			Order order=orderService.getOrderById(oid);
+			return ResponseEntity.ok().body(order);
+		}
+		catch(InvalidIdException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+		
+	}
 }

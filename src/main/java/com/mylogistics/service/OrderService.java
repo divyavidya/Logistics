@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.mylogistics.exception.InvalidIdException;
 import com.mylogistics.model.Order;
-import com.mylogistics.model.Route;
 import com.mylogistics.repository.OrderRepository;
 
 @Service
@@ -29,5 +29,14 @@ private OrderRepository orderRepository;
 	public List<Order> getOrdersByCarrier(int caid) {
 		return orderRepository.findByCarrierId(caid);
 	}
+
+	public List<Order> getOrdersByCustomer(int cid) {
+		return orderRepository.findByCustomerId(cid);
+	}
+
+	public List<Order> getAllOrders(Pageable pageable) {
+		return orderRepository.findAll(pageable).getContent();
+	}
+
 
 }

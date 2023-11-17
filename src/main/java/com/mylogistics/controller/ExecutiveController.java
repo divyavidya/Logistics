@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +31,7 @@ import com.mylogistics.service.ExecutiveService;
 import com.mylogistics.service.OrderService;
 import com.mylogistics.service.RouteService;
 import com.mylogistics.service.UserService;
+
 
 @RestController
 @RequestMapping("/executive")
@@ -64,6 +66,21 @@ public class ExecutiveController {
 		executive = executiveService.postExecutive(executive);
 		return executive;
 	}
+	@PostMapping("/carrierOnboard")
+	public Carrier postCustomer(@RequestBody Carrier carrier) {
+		User user = carrier.getUser();
+		/*I am encrypting the password*/
+		String passwordPlain=user.getPassword();
+		String encodedPassword=passwordEncoder.encode(passwordPlain);
+		user.setPassword(encodedPassword);
+		user.setRole(RoleType.CARRIER);
+		//Step 1 Save user in db and attach saved user to customer
+		user = userService.postUser(user);
+		//Step 2: Attach user and save carrier
+		carrier.setUser(user);
+		carrier = carrierService.postCustomer(carrier);
+		return carrier; 
+	}
 
 	@PostMapping("/addRoute")
 	public Route postExecutive(@RequestBody Route route) {
@@ -93,6 +110,14 @@ public class ExecutiveController {
 		Pageable pageable = PageRequest.of(page, size);
 		return carrierService.getAllCarriers(pageable);
 	}
+	
+	@GetMapping("/allOrders")
+	public List<Order> getAllOrders(
+			@RequestParam(value="page",required=false,defaultValue="0") Integer page,
+			@RequestParam(value="size",required=false,defaultValue="100000")Integer size){
+		Pageable pageable =PageRequest.of(page, size);
+		return orderService.getAllOrders(pageable);
+	}
 
 	@PutMapping("/putCarrier/{oid}/{caid}")
 	public ResponseEntity<?> updateCarrier(@PathVariable("oid") int oid, @PathVariable("caid") int caid,
@@ -121,6 +146,27 @@ public class ExecutiveController {
 			order = orderService.postOrder(order);
 			return ResponseEntity.ok().body(order);
 		} catch (InvalidIdException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+	}
+	@DeleteMapping("/route/delete/{rid}")
+	public ResponseEntity<?> deleteRoute(@PathVariable("rid") int rid){
+		try {
+			Route route=routeService.getRouteById(rid);
+			routeService.deleteRoute(route.getId());
+			return ResponseEntity.ok().body("Route Record Deleted");
+		}catch(InvalidIdException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+	}
+	@DeleteMapping("/carrier/delete/{caid}")
+	public ResponseEntity<?> deleteCarrier(@PathVariable("caid") int caid){
+		try {
+			Carrier carrier=carrierService.getCarrierById(caid);
+			carrierService.deleteCarrier(carrier.getId());
+			userService.deleteUser(carrier.getUser());
+			return ResponseEntity.ok().body("Carrier Record Deleted");
+		}catch(InvalidIdException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}

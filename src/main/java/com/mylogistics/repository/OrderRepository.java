@@ -12,4 +12,6 @@ public interface OrderRepository extends JpaRepository<Order, Integer>{
 	@Query("select o from Order o where o.carrier.id=?1")
 	List<Order> findByCarrierId(int caid);
 
+	List<Order> findByCustomerId(int cid);
+
 }
