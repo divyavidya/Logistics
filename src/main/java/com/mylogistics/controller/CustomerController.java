@@ -3,14 +3,18 @@ package com.mylogistics.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mylogistics.dto.OrderDto;
 import com.mylogistics.enums.RoleType;
 import com.mylogistics.enums.StatusType;
 import com.mylogistics.exception.InvalidIdException;
@@ -47,6 +51,8 @@ public class CustomerController {
 	@Autowired
 	private OrderService orderService;
 	
+
+	
 	@PostMapping("/customer/signup")
 	public Customer postCustomer(@RequestBody Customer customer) {
 		User user = customer.getUser();
@@ -64,12 +70,14 @@ public class CustomerController {
 	}
 	
 	
-	@PostMapping("/customer/{cid}/{source}/{destination}")
-	public ResponseEntity<?> placeOrder(@RequestBody Order order,@PathVariable("cid") int cid,@PathVariable("source") String source, 
-			@PathVariable("destination") String destination) {
+	@PostMapping("/customer/{cid}")
+	public ResponseEntity<?> placeOrder(@RequestBody OrderDto dto, @PathVariable("cid") int cid) {
 		try{
 			//get route by source,destination and save in order
+			String source = dto.getSource();
+			String destination = dto.getDestination();
 			Route route = routeService.getBySrcDest(source,destination);
+			Order order = new Order();
 			order.setRoute(route);
 			//calculate cost
 			double distance=route.getDistance();
@@ -81,11 +89,13 @@ public class CustomerController {
 			Customer customer=customerService.getOne(cid);
 			order.setCustomer(customer);
 			//save product details in db and save product id in order
-			Product product = productService.postProduct(order.getProduct());
+			Product product = productService.postProduct(dto.getProduct());
 			order.setProduct(product);
 			//save receiver details in db and save receiver id in order
-			Receiver receiver=receiverService.postReceiver(order.getReceiver());
+			Receiver receiver=receiverService.postReceiver(dto.getReceiver());
 			order.setReceiver(receiver);
+			order.setPickUpAddress(dto.getPickUpAddress());
+			order.setPickUpDate(dto.getPickUpDate());
 			order=orderService.postOrder(order);
 			return ResponseEntity.ok().body(order);
 			
@@ -94,11 +104,13 @@ public class CustomerController {
 		}
 	}
 	@GetMapping("/customer/getAllOrdersHistory/{cid}")
-	public ResponseEntity<?> getOrdersByCustomer(@PathVariable("cid") int cid){
+	public ResponseEntity<?> getOrdersByCustomer(@PathVariable("cid") int cid,@RequestParam(value="page",required=false,defaultValue="0") Integer page,
+			@RequestParam(value="size",required=false,defaultValue="100000")Integer size){
 		try {
 			//get order by CarrierId
 			Customer customer =customerService.getCustomerById(cid);
-			List<Order> list = orderService.getOrdersByCustomer(cid);
+			Pageable pageable =PageRequest.of(page, size);
+			List<Order> list = orderService.getOrdersByCustomer(cid,pageable);
 			return ResponseEntity.ok().body(list);
 		}catch(InvalidIdException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());

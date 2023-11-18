@@ -26,12 +26,12 @@ private OrderRepository orderRepository;
 			return optional.get();
 	}
 	
-	public List<Order> getOrdersByCarrier(int caid) {
-		return orderRepository.findByCarrierId(caid);
+	public List<Order> getOrdersByCarrier(int caid, Pageable pageable) {
+		return orderRepository.findByCarrierId(caid,pageable);
 	}
 
-	public List<Order> getOrdersByCustomer(int cid) {
-		return orderRepository.findByCustomerId(cid);
+	public List<Order> getOrdersByCustomer(int cid, Pageable pageable) {
+		return orderRepository.findByCustomerId(cid,pageable);
 	}
 
 	public List<Order> getAllOrders(Pageable pageable) {
