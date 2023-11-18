@@ -3,12 +3,16 @@ package com.mylogistics.model;
 import java.time.LocalDate;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import com.mylogistics.enums.StatusType;
 
 
 
@@ -21,7 +25,8 @@ public class Order {
 	private String pickUpAddress;
 	private LocalDate pickUpDate;
 	private double cost;
-	private String status;
+	@Enumerated(EnumType.STRING)
+	private StatusType status;
 	
 	
 	@OneToOne
@@ -52,12 +57,7 @@ public class Order {
 	public void setCost(double cost) {
 		this.cost = cost;
 	}
-	public String getStatus() {
-		return status;
-	}
-	public void setStatus(String status) {
-		this.status = status;
-	}
+	
 	public LocalDate getPickUpDate() {
 		return pickUpDate;
 	}
@@ -95,17 +95,18 @@ public class Order {
 	public void setProduct(Product product) {
 		this.product = product;
 	}
+	public StatusType getStatus() {
+		return status;
+	}
+	public void setStatus(StatusType status) {
+		this.status = status;
+	}
 	@Override
 	public String toString() {
 		return "Order [id=" + id + ", pickUpAddress=" + pickUpAddress + ", pickUpDate=" + pickUpDate + ", cost=" + cost
 				+ ", status=" + status + ", receiver=" + receiver + ", route=" + route + ", customer=" + customer
 				+ ", carrier=" + carrier + ", product=" + product + "]";
 	}
-	
-	
-	
-	
-	
 	
 	
 }

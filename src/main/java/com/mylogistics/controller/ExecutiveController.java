@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mylogistics.enums.RoleType;
+import com.mylogistics.enums.StatusType;
 import com.mylogistics.exception.InvalidIdException;
 import com.mylogistics.model.Carrier;
 import com.mylogistics.model.Customer;
@@ -50,7 +51,6 @@ public class ExecutiveController {
 	private CarrierService carrierService;
 	@Autowired
 	private OrderService orderService;
-
 	@PostMapping("/add")
 	public Executive postExecutive(@RequestBody Executive executive) {
 		User user = executive.getUser();
@@ -122,7 +122,7 @@ public class ExecutiveController {
 	@PutMapping("/putCarrier/{oid}/{caid}")
 	public ResponseEntity<?> updateCarrier(@PathVariable("oid") int oid, @PathVariable("caid") int caid,
 			@RequestBody Order newOrder) {
-		try {
+		try { 
 			Carrier carrier = carrierService.getCarrierById(caid);
 			Order order = orderService.getOrderById(oid);
 			order.setCarrier(carrier);
@@ -145,6 +145,28 @@ public class ExecutiveController {
 
 			order = orderService.postOrder(order);
 			return ResponseEntity.ok().body(order);
+		} catch (InvalidIdException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+	}
+	@PutMapping("/putRoute/{rid}")
+	public ResponseEntity<?> updateRoute(@PathVariable("rid") int rid,
+			@RequestBody Route newRoute) {
+		try { 
+			Route route = routeService.getRouteById(rid);
+			if (newRoute.getSource()!=null)
+				route.setSource(newRoute.getSource());
+			if(newRoute.getDestination()!=null)
+				route.setDestination(newRoute.getDestination());
+			if(newRoute.getDistance()!=0)
+				route.setDistance(newRoute.getDistance());
+			if(newRoute.getVehicle()!=null)
+				route.setVehicle(newRoute.getVehicle());
+			if(newRoute.getNoOfDays()!=0)
+				route.setNoOfDays(newRoute.getNoOfDays());
+
+			route = routeService.postRoute(route);
+			return ResponseEntity.ok().body(route);
 		} catch (InvalidIdException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}

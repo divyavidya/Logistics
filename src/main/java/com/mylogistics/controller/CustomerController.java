@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mylogistics.enums.RoleType;
+import com.mylogistics.enums.StatusType;
 import com.mylogistics.exception.InvalidIdException;
 import com.mylogistics.model.Customer;
 import com.mylogistics.model.Order;
@@ -72,10 +73,10 @@ public class CustomerController {
 			order.setRoute(route);
 			//calculate cost
 			double distance=route.getDistance();
-			int days=Integer.parseInt(route.getNoOfDays());
+			int days=route.getNoOfDays();
 			double cost = distance*days;
 			order.setCost(cost);
-			order.setStatus("Booked Order");
+			order.setStatus(StatusType.PENDING);
 			//fetch customer id and save in order
 			Customer customer=customerService.getOne(cid);
 			order.setCustomer(customer);

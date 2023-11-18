@@ -13,7 +13,7 @@ public class Route {
 	private String source;
 	private String destination;
 	private double distance;
-	private String noOfDays;
+	private int noOfDays;
 	private String vehicle;
 	public int getId() {
 		return id;
@@ -39,13 +39,14 @@ public class Route {
 	public void setDistance(double distance) {
 		this.distance = distance;
 	}
-	public String getNoOfDays() {
+	
+	
+	public int getNoOfDays() {
 		return noOfDays;
 	}
-	public void setNoOfDays(String noOfDays) {
+	public void setNoOfDays(int noOfDays) {
 		this.noOfDays = noOfDays;
 	}
-	
 	public String getVehicle() {
 		return vehicle;
 	}
@@ -57,6 +58,7 @@ public class Route {
 		return "Route [id=" + id + ", source=" + source + ", destination=" + destination + ", distance=" + distance
 				+ ", noOfDays=" + noOfDays + ", vehicle=" + vehicle + "]";
 	}
+	
 	
 }
 
