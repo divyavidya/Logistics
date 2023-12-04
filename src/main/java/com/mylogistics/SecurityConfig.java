@@ -3,6 +3,7 @@ package com.mylogistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -27,8 +28,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers("/customer/signup", "/executive/add","/executive/carrierOnboard").permitAll().anyRequest()
-				.authenticated().and().httpBasic().and().csrf().disable().cors().disable();
+		http.authorizeRequests()
+		 .antMatchers(HttpMethod.GET,"/user/login").authenticated()
+		 .anyRequest().permitAll()
+		 .and().httpBasic()
+		 .and().cors().disable()
+		 .csrf().disable();
 
 	}
 

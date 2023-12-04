@@ -14,6 +14,7 @@ public class Route {
 	private String destination;
 	private double distance;
 	private int noOfDays;
+	private String location;
 	private String vehicle;
 	public int getId() {
 		return id;
@@ -53,11 +54,19 @@ public class Route {
 	public void setVehicle(String vehicle) {
 		this.vehicle = vehicle;
 	}
+	
+	public String getLocation() {
+		return location;
+	}
+	public void setLocation(String location) {
+		this.location = location;
+	}
 	@Override
 	public String toString() {
 		return "Route [id=" + id + ", source=" + source + ", destination=" + destination + ", distance=" + distance
-				+ ", noOfDays=" + noOfDays + ", vehicle=" + vehicle + "]";
+				+ ", noOfDays=" + noOfDays + ", location=" + location + ", vehicle=" + vehicle + "]";
 	}
+	
 	
 	
 }

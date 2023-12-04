@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.mylogistics.enums.CarrierStatus;
 import com.mylogistics.exception.InvalidIdException;
 import com.mylogistics.model.Carrier;
 import com.mylogistics.repository.CarrierRepository;
@@ -34,6 +35,12 @@ public class CarrierService {
 	public void deleteCarrier(int id) {
 		carrierRepository.deleteById(id);
 		
+	}
+
+	public List<Carrier> getCarrier(String source) {
+		// TODO Auto-generated method stub
+		String status="AVAILABLE";
+		return carrierRepository.getCarrier(source,CarrierStatus.AVAILABLE);
 	}
 
 	

@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,12 +19,14 @@ import com.mylogistics.dto.OrderDto;
 import com.mylogistics.enums.RoleType;
 import com.mylogistics.enums.StatusType;
 import com.mylogistics.exception.InvalidIdException;
+import com.mylogistics.model.Carrier;
 import com.mylogistics.model.Customer;
 import com.mylogistics.model.Order;
 import com.mylogistics.model.Product;
 import com.mylogistics.model.Receiver;
 import com.mylogistics.model.Route;
 import com.mylogistics.model.User;
+import com.mylogistics.service.CarrierService;
 import com.mylogistics.service.CustomerService;
 import com.mylogistics.service.OrderService;
 import com.mylogistics.service.ProductService;
@@ -34,6 +37,7 @@ import com.mylogistics.service.UserService;
 
 
 @RestController
+@CrossOrigin(origins = {"http://localhost:3000"})
 public class CustomerController {
 
 	@Autowired
@@ -50,8 +54,8 @@ public class CustomerController {
 	private ReceiverService receiverService;
 	@Autowired
 	private OrderService orderService;
-	
-
+	@Autowired
+	private CarrierService carrierService;
 	
 	@PostMapping("/customer/signup")
 	public Customer postCustomer(@RequestBody Customer customer) {
@@ -96,6 +100,9 @@ public class CustomerController {
 			order.setReceiver(receiver);
 			order.setPickUpAddress(dto.getPickUpAddress());
 			order.setPickUpDate(dto.getPickUpDate());
+			List<Carrier> list=carrierService.getCarrier(source);
+			Carrier carrier=list.get(0);
+			order.setCarrier(carrier);
 			order=orderService.postOrder(order);
 			return ResponseEntity.ok().body(order);
 			
