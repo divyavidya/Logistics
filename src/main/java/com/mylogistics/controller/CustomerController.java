@@ -2,6 +2,7 @@ package com.mylogistics.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -57,6 +58,8 @@ public class CustomerController {
 	@Autowired
 	private CarrierService carrierService;
 	
+	@Autowired
+	private Logger logger;
 	@PostMapping("/customer/signup")
 	public Customer postCustomer(@RequestBody Customer customer) {
 		User user = customer.getUser();
@@ -104,9 +107,11 @@ public class CustomerController {
 			Carrier carrier=list.get(0);
 			order.setCarrier(carrier);
 			order=orderService.postOrder(order);
+			logger.info("Order placed successfully");
 			return ResponseEntity.ok().body(order);
-			
+			 
 		}catch(InvalidIdException e) {
+			logger.error("Issue in placing order");
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}
@@ -133,5 +138,10 @@ public class CustomerController {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 		
+	}
+	@GetMapping("/getLocations/{source}")
+	public List<String> getLocationBySource(@PathVariable("source") String source){
+		List<String> list=routeService.getLocationBySource(source);
+		return list;
 	}
 }

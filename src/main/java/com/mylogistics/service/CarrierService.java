@@ -17,7 +17,7 @@ public class CarrierService {
 	@Autowired
 	private CarrierRepository carrierRepository;
 
-	public Carrier postCustomer(Carrier carrier) {
+	public Carrier postCarrier(Carrier carrier) {
 		return carrierRepository.save(carrier);
 	}
 

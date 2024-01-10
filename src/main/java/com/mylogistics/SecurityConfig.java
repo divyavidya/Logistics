@@ -1,5 +1,7 @@
 package com.mylogistics;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,5 +51,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 		return dao;
 	}
-
+@Bean
+public Logger getLogger() {
+	return LoggerFactory.getLogger("Log Records");
+}
 }

@@ -31,6 +31,11 @@ private UserRepository userRepository;
 		userRepository.delete(user);
 		
 	}
+	public boolean isUsernameUnique(String username) {
+		// TODO Auto-generated method stub
+		User existingUser=userRepository.findByUsername(username);
+		return existingUser==null;
+	}
 
 }
 

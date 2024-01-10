@@ -45,4 +45,20 @@ public class RouteService {
 		
 	}
 
+	public List<String> getLocationBySource(String source) {
+		// TODO Auto-generated method stub
+		return routeRepository.getLocationBySource(source);
+	}
+
+	public List<String> getAllCities() {
+		// TODO Auto-generated method stub
+		return routeRepository.getACities();
+	}
+
+	public List<String> designatedLocations() {
+		// TODO Auto-generated method stub
+		return routeRepository.designatedLocations();
+	}
+
+
 }

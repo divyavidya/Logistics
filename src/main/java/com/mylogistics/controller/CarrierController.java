@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -14,23 +15,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mylogistics.enums.CarrierStatus;
 import com.mylogistics.exception.InvalidIdException;
 import com.mylogistics.model.Carrier;
 import com.mylogistics.model.Order;
 import com.mylogistics.service.CarrierService;
 import com.mylogistics.service.OrderService;
+import com.mylogistics.service.RouteService;
 
 
 @RestController
 @RequestMapping("/carrier")
+@CrossOrigin(origins = {"http://localhost:3000"})
 public class CarrierController {
 
 	@Autowired
 	private CarrierService carrierService;
 	@Autowired
 	private OrderService orderService;
-	
-	
+	@Autowired
+	private RouteService routeService;
 	@PutMapping("/putCarrier/{oid}")
 	public ResponseEntity<?> updateCarrier(@PathVariable("oid") int oid,
 			@RequestBody Order newOrder) {
@@ -71,6 +75,45 @@ public class CarrierController {
 			return ResponseEntity.ok().body(list);
 		}catch(InvalidIdException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+	}
+	@GetMapping("/getLocations/{source}")
+	public List<String> getLocationsBySource(@PathVariable("source") String source){
+		List<String> list=routeService.getLocationBySource(source);
+		return list;
+	}
+	
+	@PutMapping("/updateCarrier/{cid}")
+	public ResponseEntity<?> putCarrier(@PathVariable("cid") int cid,@RequestBody Carrier newCarrier) {
+		try { 
+			Carrier carrier = carrierService.getCarrierById(cid);
+			if (newCarrier.getName() != null)
+				carrier.setName(newCarrier.getName());
+			if (newCarrier.getCity() != null)
+				carrier.setCity(newCarrier.getCity());
+			if (newCarrier.getAddress() != null)
+				carrier.setAddress(newCarrier.getAddress());
+			if (newCarrier.getStatus()!= null)
+				carrier.setStatus(newCarrier.getStatus());
+			if (newCarrier.getContact() != null)
+				carrier.setContact(newCarrier.getContact());
+			if (newCarrier.getEmail() != null)
+				carrier.setEmail(newCarrier.getEmail());
+			carrier=carrierService.postCarrier(carrier);
+			return ResponseEntity.ok().body(carrier);
+		}
+		catch(InvalidIdException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+	}
+	@GetMapping("/details/{caid}")
+	public ResponseEntity<?> getDetails(@PathVariable("caid") int caid){
+		try {
+			Carrier carrier=carrierService.getCarrierById(caid);
+			return ResponseEntity.ok().body(carrier);
+		}
+		catch(InvalidIdException e) {
+			return ResponseEntity.badRequest().body(e.getMessage()); 
 		}
 	}
 }

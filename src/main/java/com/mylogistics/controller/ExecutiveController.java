@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mylogistics.enums.CarrierStatus;
 import com.mylogistics.enums.RoleType;
 import com.mylogistics.enums.StatusType;
 import com.mylogistics.exception.InvalidIdException;
@@ -36,6 +38,7 @@ import com.mylogistics.service.UserService;
 
 @RestController
 @RequestMapping("/executive")
+@CrossOrigin(origins = {"http://localhost:3000"})
 public class ExecutiveController {
 	@Autowired
 	private ExecutiveService executiveService;
@@ -67,7 +70,7 @@ public class ExecutiveController {
 		return executive;
 	}
 	@PostMapping("/carrierOnboard")
-	public Carrier postCustomer(@RequestBody Carrier carrier) {
+	public Carrier postCarrier(@RequestBody Carrier carrier) {
 		User user = carrier.getUser();
 		/*I am encrypting the password*/
 		String passwordPlain=user.getPassword();
@@ -78,7 +81,8 @@ public class ExecutiveController {
 		user = userService.postUser(user);
 		//Step 2: Attach user and save carrier
 		carrier.setUser(user);
-		carrier = carrierService.postCustomer(carrier);
+		carrier.setStatus(CarrierStatus.AVAILABLE);
+		carrier = carrierService.postCarrier(carrier);
 		return carrier; 
 	}
 
@@ -101,7 +105,7 @@ public class ExecutiveController {
 			@RequestParam(value = "size", required = false, defaultValue = "100000") Integer size) {
 		Pageable pageable = PageRequest.of(page, size);
 		return customerService.getAllCustomers(pageable);
-	}
+	} 
 
 	@GetMapping("/getallCarriers")
 	public List<Carrier> getAllCarriers(
@@ -191,5 +195,20 @@ public class ExecutiveController {
 		}catch(InvalidIdException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
+	}
+	@GetMapping("/getCarriersbySource/{source}")
+	public List<Carrier> getAllCarriersBySource(@PathVariable("source") String source) {
+	List<Carrier> list=carrierService.getCarrier(source);
+	return list;
+	}
+	@GetMapping("/getAllCities")
+	public List<String> getAllCities(){
+		List<String> list=routeService.getAllCities();
+		return list;
+	}
+	@GetMapping("/desiLocations")
+	public List<String> designatedLocations(){
+		List<String> list=routeService.designatedLocations();
+		return list;
 	}
 }
